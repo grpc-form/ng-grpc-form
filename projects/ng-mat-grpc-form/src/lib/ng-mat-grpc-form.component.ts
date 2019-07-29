@@ -119,13 +119,13 @@ export class NgMatGrpcFormComponent implements OnInit {
 		const req = new GetFormRequest();
 		req.setName(this.name);
 		this.client.getForm(req, null, (err, form) => {
+			console.log(form);
 			if (err) {
 				console.log(err);
 				return;
 			}
 			this.form = form;
 		});
-		console.log(this.form)
 	}
 
 	validateField(field: Field): void {

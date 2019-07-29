@@ -90,7 +90,7 @@ export class CarComponent implements OnInit {
 
     let button = new Button();
     button.setLabel("Send");
-    button.setType(ButtonFuncType.SEND);
+    button.setType(ButtonFuncType.BUTTON_FUNC_SEND);
     button.setStatus(ButtonStatus.BUTTON_ACTIVE);
 
     this.form.setButtonsList([button]);

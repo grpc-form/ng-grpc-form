@@ -71,7 +71,7 @@ import {
 		</mat-error>
 	</div>
 	<div *ngFor="let button of form.getButtonsList()">
-		<button *ngIf="button.getStatus != BUTTON_STATUS.BUTTON_HIDDEN" (click)="do(button)" [disabled]="button.getStatus() == BUTTON_STATUS.BUTTON_DISABLED" 
+		<button *ngIf="button.getStatus() != BUTTON_STATUS.BUTTON_HIDDEN" (click)="do(button.getType())" [disabled]="button.getStatus() == BUTTON_STATUS.BUTTON_DISABLED" 
 			mat-button>{{ button.getLabel() }}</button>
 	</div>
 </div>
@@ -95,31 +95,29 @@ export class NgMatGrpcFormComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		if (this.test()) {
-			return
-		}
 		this.client = new FormServiceClient(this.host);
 		this.get();
 	}
 
-	do(button: Button): void {
-		if (button.getType() == ButtonFuncType.SEND) {
+	do(buttonFunc: number): void {
+		if (buttonFunc == ButtonFuncType.BUTTON_FUNC_SEND) {
 			this.send();
-		} else if (button.getType() == ButtonFuncType.RESET) {
+			return
+		}
+		if (buttonFunc == ButtonFuncType.BUTTON_FUNC_RESET) {
 			this.get();
-		} else {
-			this.validate()
+			return
+		}
+		if (buttonFunc == ButtonFuncType.BUTTON_FUNC_VALIDATE) {
+			this.validate();
+			return
 		}
 	}
 
 	get(): void {
-		if (this.test()) {
-			return
-		}
 		const req = new GetFormRequest();
 		req.setName(this.name);
 		this.client.getForm(req, null, (err, form) => {
-			console.log(form);
 			if (err) {
 				console.log(err);
 				return;
@@ -150,11 +148,14 @@ export class NgMatGrpcFormComponent implements OnInit {
 			}
 			field.setError("");
 		});
-		this.test();
 	}
 
 	validate() {
-		if (this.test()) {
+		if (this.host == undefined) {
+			let self = this;
+			this.form.getFieldsList().forEach(function(field) {
+				self.validateField(field)
+			});
 			return
 		}
 		this.client.validateForm(this.form, null, (err, form) => {
@@ -164,12 +165,11 @@ export class NgMatGrpcFormComponent implements OnInit {
 			}
 			this.form = form;
 		});
-		this.test();
 	}
 
 	send(): void {
-		if (this.test()) {
-			this.success.emit("Thanks");
+		if (this.host == undefined) {
+			this.success.emit("Thanks")
 			return
 		}
 		this.client.sendForm(this.form, null, (err, res) => {
@@ -182,15 +182,5 @@ export class NgMatGrpcFormComponent implements OnInit {
 				this.success.emit(res.getMessage());
 			}
 		});
-		this.test()
 	}
-
-	test(): boolean {
-		if (this.host == undefined) {
-			console.log(this.form);
-			return true
-		}
-		return false
-	}
-
 }

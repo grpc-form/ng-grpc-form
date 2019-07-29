@@ -1,12 +1,19 @@
-import { Component, OnInit } from '@angular/core';
 import {
-  Button, BUTTON_FUNC,
+  Component,
+  OnInit
+} from '@angular/core';
+import {
+  Button,
+  ButtonFuncType,
+  ButtonStatus,
   Field,
+  FieldStatus,
   Form,
-  Input,
+  NumericField,
   Option as FormOption,
-  RadioGroup, Select,
-  Slider, STATUS
+  SelectField,
+  SelectType,
+  TextField,
 } from "grpc-form-ts";
 
 @Component({
@@ -20,29 +27,31 @@ export class CarComponent implements OnInit {
 
   ngOnInit() {
     let username = new Field();
-    let usernameInput = new Input();
-    usernameInput.setPlaceholder("Please enter your username");
-    username.setInput(usernameInput);
+    let usernameInput = new TextField();
+    username.setLabel("Please enter your username");
+    username.setTextField(usernameInput);
+    usernameInput.setMin(4);
+    usernameInput.setMinError("Too short");
     let andy = new FormOption();
     andy.setIndex(1);
     andy.setValue("Andy");
     usernameInput.addOptions(andy);
-    username.setInstantValidate(true);
-    username.setStatus(STATUS.REQUIRED);
+    username.setInstantValidate(false);
+    username.setStatus(FieldStatus.FIELD_STATUS_REQUIRED);
 
     let age = new Field();
-    let ageSlider = new Slider();
+    let ageSlider = new NumericField();
     ageSlider.setValue(25);
     ageSlider.setMin(14);
     ageSlider.setMax(99);
     ageSlider.setStep(1);
-    age.setSlider(ageSlider);
-    age.setInstantValidate(true);
-    age.setStatus(STATUS.REQUIRED);
+    age.setNumericField(ageSlider);
+    age.setInstantValidate(false);
+    age.setStatus(FieldStatus.FIELD_STATUS_REQUIRED);
 
     let car = new Field();
     car.setLabel("Do you have a car?");
-    let carRadio = new RadioGroup();
+    let carRadio = new SelectField();
     let no = new FormOption();
     no.setIndex(1);
     no.setValue("No");
@@ -50,25 +59,27 @@ export class CarComponent implements OnInit {
     yes.setIndex(2);
     yes.setValue("Yes");
     carRadio.setOptionsList([no, yes]);
-    carRadio.setValue(yes.getIndex());
-    car.setRadioGroup(carRadio);
-    car.setInstantValidate(true);
-    car.setStatus(STATUS.REQUIRED);
+    carRadio.setIndex(1);
+    carRadio.setType(SelectType.SELECT_TYPE_SIMPLE);
+    car.setSelectField(carRadio);
+    car.setInstantValidate(false);
+    car.setStatus(FieldStatus.FIELD_STATUS_REQUIRED);
 
-    let brand = new Field();
-    let brandSelect = new Select();
-    brandSelect.setPlaceholder("What kind of car are you driving?");
+    let brand = new  Field();
+    let brandSelect = new SelectField();
+    brand.setLabel("What kind of car are you driving?");
     let audi = new FormOption();
     audi.setIndex(1);
     audi.setValue("Audi");
     let bmw = new FormOption();
     bmw.setIndex(2);
     bmw.setValue("BMW");
-    brandSelect.setValue(bmw.getIndex());
+    brandSelect.setIndex(2);
     brandSelect.setOptionsList([audi, bmw]);
-    brand.setSelect(brandSelect);
-    brand.setInstantValidate(true);
-    brand.setStatus(STATUS.REQUIRED);
+    brandSelect.setType(SelectType.SELECT_TYPE_MULTI);
+    brand.setSelectField(brandSelect);
+    brand.setInstantValidate(false);
+    brand.setStatus(FieldStatus.FIELD_STATUS_REQUIRED);
 
     this.form = new Form();
     this.form.setName("car");
@@ -79,7 +90,8 @@ export class CarComponent implements OnInit {
 
     let button = new Button();
     button.setLabel("Send");
-    button.setButtonFunc(BUTTON_FUNC.SEND);
+    button.setType(ButtonFuncType.SEND);
+    button.setStatus(ButtonStatus.BUTTON_ACTIVE);
 
     this.form.setButtonsList([button]);
   }
